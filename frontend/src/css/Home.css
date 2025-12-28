@@ -1,0 +1,72 @@
+.main-container{
+    background: var(--bg-primary);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center
+}
+
+.title-container{
+    margin-bottom: 10px;
+}
+
+hr{
+    width: 50px;
+    height: 3px;
+    background: linear-gradient(to right, var(--pistons-red), var(--pistons-blue));
+    border: none;
+    border-radius: 2px;
+    margin: 0 auto;
+}
+
+.title{
+    color: var(--pistons-red);
+    font-size: 2.5rem;
+    text-shadow: 2px 2px 0px var(--pistons-blue), 6px 6px 0px rgba(0, 0, 0, 0.3);
+}
+
+.home-page-content{
+    display: flex;
+    width: 70vw;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.game-options-container{
+    display: flex;
+    flex-direction: column;
+}
+
+.game-option-button{
+    background-color: var(--pistons-red);
+    width: 190px;
+    height: 35px;
+    color: var(--text-primary);
+    padding: 5px;
+    margin: 5px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    font-size: .75rem;
+}
+
+.game-option-button:hover{
+    background-color: var(--pistons-blue);
+}
+
+.game-option-disabled-button{
+    background-color: var(--bg-secondary);
+    width: 190px;
+    height: 35px;
+    border: 1px solid var(--border-secondary);
+    padding: 5px;
+    margin: 5px;
+    cursor: not-allowed;
+    color: var(--text-disabled);
+}
+
+.footer{
+    margin-top: 5px;
+    font-size: 10px;
+    color: var(--text-disabled);
+}

@@ -1,3 +1,14 @@
+*{
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+    font-family: 'Impact', sans-serif;
+}
+
+button {
+  background: none;
+  border: none;
+}
 :root {
   /* brand colors */
   --pistons-red: #c8102e;
