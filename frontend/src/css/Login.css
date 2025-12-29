@@ -149,21 +149,61 @@
 
 @media (max-width: 768px) {
     .title{
-        font-size: 3rem;
-        text-shadow: 2px 2px 0px var(--pistons-blue), 5px 5px 0px rgba(0, 0, 0, 0.3);
+        font-size: 4.5rem;
+        text-shadow: 3px 3px 0px var(--pistons-blue), 6px 6px 0px rgba(0, 0, 0, 0.3);
+    }
+    
+    .title-of-game{
+        font-size: 1.25rem;
     }
     
     .login-container{
+        padding: 2.5rem 2rem;
+    }
+    
+    .login-textview{
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .username-textview,
+    .password-textview{
+        font-size: 1.125rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .username,
+    .password{
+        padding: 1.25rem;
+        font-size: 1.25rem;
+    }
+    
+    .enter-game-button{
         padding: 1.5rem;
+        font-size: 1.5rem;
+    }
+    
+    .create-account-button{
+        padding: 1.25rem;
+        font-size: 1.125rem;
+    }
+    
+    .back-to-menu-button{
+        padding: 1.25rem;
+        font-size: 1.125rem;
     }
 }
 
 @media (max-width: 480px) {
     .title{
-        font-size: 2.5rem;
+        font-size: 4rem;
     }
     
     .login-page-container{
-        width: 95%;
+        width: 90%;
+    }
+    
+    .title-container{
+        margin-bottom: 2.5rem;
     }
 }
