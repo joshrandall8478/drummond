@@ -1,12 +1,19 @@
 import "../css/Dashboard.css"
+import { useNavigate } from 'react-router-dom';
 function Dashboard() {
+    const navigate = useNavigate();
+
+    function redirectToHome() {
+        navigate('/');
+    }
+
     return <>
         <div className = "dashboard-main-content">
             <div className="dashboard-content">
 
                 <div className="title-and-menu-container">
                     <p className = "title-game">STARTING 5 BATTLES</p>
-                    <button>BACK TO MENU</button>
+                    <button onClick={redirectToHome}>BACK TO MENU</button>
                 </div>
                 <hr className="dashboard-hr"></hr>
 
