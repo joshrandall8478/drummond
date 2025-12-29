@@ -9,7 +9,7 @@ function Login() {
     }
 
   return <>
-    <div className="main-container">
+    <div className="login-main-container">
         <div className="login-page-container">
 
             <div className="title-container">

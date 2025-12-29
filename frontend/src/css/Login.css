@@ -1,6 +1,19 @@
-.main-container{
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+.login-main-container{
     background: var(--bg-primary);
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -74,7 +87,7 @@
     border: 2px solid var(--border-secondary);
     color: var(--text-primary);
     padding: 0.75rem 1rem;
-    font-size: 1rem;
+    font-size: 16px;
     box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);
     outline: none;
     transition: border-color 0.3s ease;
@@ -148,62 +161,72 @@
 }
 
 @media (max-width: 768px) {
+    .login-main-container{
+        align-items: flex-start;
+        padding-top: 2rem;
+    }
+    
     .title{
-        font-size: 4.5rem;
-        text-shadow: 3px 3px 0px var(--pistons-blue), 6px 6px 0px rgba(0, 0, 0, 0.3);
+        font-size: 3rem;
+        text-shadow: 2px 2px 0px var(--pistons-blue), 4px 4px 0px rgba(0, 0, 0, 0.3);
     }
     
     .title-of-game{
-        font-size: 1.25rem;
+        font-size: 0.75rem;
     }
     
     .login-container{
-        padding: 2.5rem 2rem;
+        padding: 1.5rem;
     }
     
     .login-textview{
-        font-size: 2rem;
-        margin-bottom: 2rem;
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
     }
     
     .username-textview,
     .password-textview{
-        font-size: 1.125rem;
-        margin-bottom: 0.75rem;
+        font-size: 0.75rem;
+        margin-bottom: 0.5rem;
     }
     
     .username,
     .password{
-        padding: 1.25rem;
-        font-size: 1.25rem;
+        padding: 0.875rem;
+        font-size: 16px;
     }
     
     .enter-game-button{
-        padding: 1.5rem;
-        font-size: 1.5rem;
+        padding: 1rem;
+        font-size: 1rem;
     }
     
     .create-account-button{
-        padding: 1.25rem;
-        font-size: 1.125rem;
+        padding: 0.875rem;
+        font-size: 0.875rem;
     }
     
     .back-to-menu-button{
-        padding: 1.25rem;
-        font-size: 1.125rem;
+        padding: 0.75rem;
+        font-size: 0.75rem;
     }
 }
 
 @media (max-width: 480px) {
+    .login-main-container{
+        align-items: flex-start;
+        padding-top: 1.5rem;
+    }
+    
     .title{
-        font-size: 4rem;
+        font-size: 2.5rem;
     }
     
     .login-page-container{
-        width: 90%;
+        width: 95%;
     }
     
     .title-container{
-        margin-bottom: 2.5rem;
+        margin-bottom: 1.5rem;
     }
 }
