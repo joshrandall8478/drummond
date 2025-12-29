@@ -9,9 +9,100 @@ function Dashboard() {
                 </div>
                 <hr></hr>
 
-                <div className="high-score-container">
+                <div className="high-scores-container">
                     <p className = "high-score-this-week-textview">HIGH SCORES THIS WEEK</p>
 
+                    <div className = "high-score-player-record">
+                        <div className="high-score-contents">
+                            <div className="rank">
+                                #1
+                            </div>
+
+                            <div className="player-name-and-date-container">
+                                <p className = "player-name">PistonsPro</p>
+                                <p className = "date-achieved">Dec 29</p>
+                            </div>
+
+                            <div className="score-container">
+                                <p className="score-textview">SCORE</p>
+                                <p className="score">1,234</p>
+                            </div>
+                        </div>
+                    </div>
+
+                      <div className = "high-score-player-record">
+                        <div className="high-score-contents">
+                            <div className="rank">
+                                #2
+                            </div>
+
+                            <div className="player-name-and-date-container">
+                                <p className = "player-name">PistonsPro</p>
+                                <p className = "date-achieved">Dec 29</p>
+                            </div>
+
+                            <div className="score-container">
+                                <p className="score-textview">SCORE</p>
+                                <p className="score">1,234</p>
+                            </div>
+                        </div>
+                    </div>
+
+                      <div className = "high-score-player-record">
+                        <div className="high-score-contents">
+                            <div className="rank">
+                                #3
+                            </div>
+
+                            <div className="player-name-and-date-container">
+                                <p className = "player-name">PistonsPro</p>
+                                <p className = "date-achieved">Dec 29</p>
+                            </div>
+
+                            <div className="score-container">
+                                <p className="score-textview">SCORE</p>
+                                <p className="score">1,234</p>
+                            </div>
+                        </div>
+                    </div>
+
+                      <div className = "high-score-player-record">
+                        <div className="high-score-contents">
+                            <div className="rank">
+                                #4
+                            </div>
+
+                            <div className="player-name-and-date-container">
+                                <p className = "player-name">PistonsPro</p>
+                                <p className = "date-achieved">Dec 29</p>
+                            </div>
+
+                            <div className="score-container">
+                                <p className="score-textview">SCORE</p>
+                                <p className="score">1,234</p>
+                            </div>
+                        </div>
+                    </div>
+
+                      <div className = "high-score-player-record">
+                        <div className="high-score-contents">
+                            <div className="rank">
+                                #5
+                            </div>
+
+                            <div className="player-name-and-date-container">
+                                <p className = "player-name">PistonsPro</p>
+                                <p className = "date-achieved">Dec 29</p>
+                            </div>
+
+                            <div className="score-container">
+                                <p className="score-textview">SCORE</p>
+                                <p className="score">1,234</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    
                 </div>
             </div>
         </div>
