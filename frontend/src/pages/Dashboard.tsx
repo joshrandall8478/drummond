@@ -100,9 +100,13 @@ function Dashboard() {
                                 <p className="score">1,234</p>
                             </div>
                         </div>
-                    </div>
+                    </div>   
+                </div>
 
-                    
+                <div className="ready-to-play-container">
+                    <p className="ready-to-play-textview">READY TO PLAY?</p>
+                    <p className = "ready-to-play-info">Test your basketball knowledge and climb the leaderboard!</p>
+                    <button className="start-new-game-button">START NEW GAME</button>
                 </div>
             </div>
         </div>
