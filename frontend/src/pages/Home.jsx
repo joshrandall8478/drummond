@@ -5,7 +5,7 @@ function Home() {
   const navigate = useNavigate();
 
   function redirectToLogin() {
-    navigate('/login');
+    navigate('/starting5');
   }
   
   return <>
