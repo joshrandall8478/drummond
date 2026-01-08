@@ -40,3 +40,5 @@ secrets.json
 
 *.db
 *.sqlite
+
+*.pem
