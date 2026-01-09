@@ -4,6 +4,7 @@ namespace backend.Data.Repositories;
 
 public interface INbaPlayerRepository
 {
-    Task<List<Player>> GetAllPlayersAsync();
-    Task<Player?> GetPlayerByIdAsync(int playerId);
+    Task<PlayerStats> GetPlayerStatsAsync(int playerId);
+    Task<List<PlayerStats>> GetAllPlayersWithStatsAsync();
+    Task<List<string>> GetAllTeamNamesAsync();
 }
