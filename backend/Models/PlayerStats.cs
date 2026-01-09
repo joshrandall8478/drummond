@@ -7,6 +7,11 @@ namespace backend.Models
 {
     public class PlayerStats
     {
+        // adding these for check, might delete not sure.
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Position { get; set; }
+
         public int PlayerId { get; set; }
         public decimal? Ppg { get; set; }
         public decimal? Rpg { get; set; }
@@ -18,5 +23,6 @@ namespace backend.Models
         public int SixManAwards { get; set; }
         public int Rings { get; set; }
         public bool RookieOfTheYear { get; set; }
+        public List<string> Teams { get; set; } = new();
     }
 }

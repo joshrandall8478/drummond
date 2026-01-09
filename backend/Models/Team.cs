@@ -12,7 +12,7 @@ namespace backend.Models
         public string? Conference { get; set; } = string.Empty;
         public string? Division { get; set; } = string.Empty;
         public string? City { get; set; } = string.Empty;
-        public string? Name { get; set; } = string.Empty;
+        public string? TeamName { get; set; } = string.Empty;
         public string? FullName { get; set; } = string.Empty;
         public string? Abbreviation { get; set; } = string.Empty;
     }
