@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import '../css/Starting5.css';
 
 const API_URL = 'http://localhost:5206';
@@ -17,9 +19,9 @@ function Starting5() {
     const [players, setPlayers] = useState([]);
     const [allPlayers, setAllPlayers] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [gameComplete, setGameComplete] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [incorrectPlayers, setIncorrectPlayers] = useState([]);
 
     // Initialize game on component mount
     useEffect(() => {
@@ -46,7 +48,7 @@ function Starting5() {
 
             } catch (err) {
                 console.error('Error initializing game:', err);
-                setError(err.message);
+                toast.error(`Failed to initialize game: ${err.message}`);
             } finally {
                 setLoading(false);
             }
@@ -55,11 +57,18 @@ function Starting5() {
         initGame();
     }, []);
 
-    // Get filled positions
+    // get filled positions
     const getFilledPositions = () => {
         return Object.entries(lineup)
             .filter(([_, player]) => player !== null)
             .map(([position]) => position);
+    };
+
+    const showPlayerStats = (playerId) => {
+        const player = allPlayers.find(p => p.playerId === playerId);
+        if (player) {
+            console.log('Player Stats:', player);
+        }
     };
 
     // select position and show matching players
@@ -69,6 +78,7 @@ function Starting5() {
 
         setSelectedPosition(position);
         setSearchQuery('');
+        setIncorrectPlayers([]); // Reset incorrect players for new position
 
         // Filter players by position
         const availablePlayers = allPlayers.filter(p => p.position === position);
@@ -83,26 +93,42 @@ function Starting5() {
 
     const selectPlayer = async (player) => {
         if (!selectedPosition) return;
+        if (incorrectPlayers.includes(player.playerId)) return; // Can't select incorrect players again
 
         const isGameComplete = getFilledPositions().length === 4; // 4 because we're about to fill the 5th
 
         try {
             setLoading(true);
-            setError(null);
 
+            console.log(criteria);
             const response = await fetch(`${API_URL}/game/select-player`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    playerId: player.playerId,
-                    position: selectedPosition,
-                    isGameComplete
+                    Player: player,
+                    Position: selectedPosition,
+                    IsGameComplete: isGameComplete,
+                    Criteria: criteria,
+                    FilledPositions: getFilledPositions()
                 })
             });
 
-            if (!response.ok) throw new Error('Failed to select player');
-
             const data = await response.json();
+
+            // check if player matches criteria
+            if (!data.success || data.error) {
+                setIncorrectPlayers(prev => [...prev, player.playerId]);
+                toast.error(data.error || 'This player does not match both categories!', {
+                    position: "top-center",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
+                setLoading(false);
+                return;
+            }
 
             // update lineup ui 
             setLineup(prev => ({
@@ -118,6 +144,7 @@ function Starting5() {
             // clear selection
             setSelectedPosition(null);
             setPlayers([]);
+            setIncorrectPlayers([]);
 
             if (isGameComplete) {
                 setGameComplete(true);
@@ -126,7 +153,7 @@ function Starting5() {
                 setCriteria(data.nextCriteria);
             }
         } catch (err) {
-            setError(err.message);
+            toast.error(err.message);
         } finally {
             setLoading(false);
         }
@@ -136,6 +163,7 @@ function Starting5() {
     if (gameComplete) {
         return (
             <div className="game-container">
+                <ToastContainer />
                 <div className="complete-screen">
                     <h1 className="game-title">GAME COMPLETE!</h1>
                     <div className="final-score">
@@ -170,11 +198,10 @@ function Starting5() {
     // playing screen
     return (
         <div className="game-container">
+            <ToastContainer />
             <div className="game-header">
                 <h1 className="game-title">STARTING 5</h1>
-                <button
-                    className="logout-button"
-                >
+                <button className="logout-button">
                     LOGOUT
                 </button>
             </div>
@@ -239,13 +266,13 @@ function Starting5() {
                                     setSelectedPosition(null);
                                     setPlayers([]);
                                     setSearchQuery('');
+                                    setIncorrectPlayers([]);
                                 }}
                             >
                                 ✕
                             </button>
                         </div>
 
-                        {/* NEW: Search box */}
                         <div className="search-box">
                             <input
                                 type="text"
@@ -265,25 +292,27 @@ function Starting5() {
                             ) : filteredPlayers.length === 0 ? (
                                 <div className="no-players">No players found matching your search</div>
                             ) : (
-                                filteredPlayers.map(player => (
-                                    <div
-                                        key={player.playerId}
-                                        className="player-item"
-                                        onClick={() => selectPlayer(player)}
-                                    >
-                                        <span className="player-name">
-                                            {player.firstName} {player.lastName}
-                                        </span>
-                                        <span className="player-position">{player.position}</span>
-                                    </div>
-                                ))
+                                filteredPlayers.map(player => {
+                                    const isIncorrect = incorrectPlayers.includes(player.playerId);
+                                    return (
+                                        <div
+                                            key={player.playerId}
+                                            className={`player-item ${isIncorrect ? 'incorrect' : ''}`}
+                                            onClick={() => !isIncorrect && selectPlayer(player)}
+                                        >
+                                            <span className="player-name">
+                                                {player.firstName} {player.lastName}
+                                                {isIncorrect && <span className="incorrect-badge"> ✗</span>}
+                                            </span>
+                                            <span className="player-position">{player.position}</span>
+                                        </div>
+                                    );
+                                })
                             )}
                         </div>
                     </div>
                 </div>
             )}
-
-            {error && <div className="error-toast">{error}</div>}
         </div>
     );
 }
