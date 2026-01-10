@@ -300,9 +300,8 @@ function Starting5() {
                                         >
                                             <span className={`player-name ${isIncorrect ? 'crossed-out' : ''}`}>
                                                 {player.firstName} {player.lastName}
-                                                {isIncorrect && <span className="incorrect-badge"> ✗</span>}
                                             </span>
-                                            <span className="player-position">{player.position}</span>
+                                            <span className={`player-position ${isIncorrect ? 'crossed-out' : ''}`}>{player.position}</span>
                                         </div>
                                     );
                                 })
