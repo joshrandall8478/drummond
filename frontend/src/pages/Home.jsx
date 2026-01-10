@@ -5,7 +5,7 @@ function Home() {
   const navigate = useNavigate();
 
   function redirectToLogin() {
-    navigate('/login');
+    navigate('/starting5');
   }
   
   return <>
@@ -18,9 +18,7 @@ function Home() {
         </div>
 
         <div className = "game-options-container">
-          <button className="game-option-button" onClick={redirectToLogin}>STARTING 5 BATTLES</button>
-          <button className="game-option-disabled-button" onClick={redirectToLogin}>GRID (COMING SOON)</button>
-          <button className="game-option-disabled-button" disabled={true}>COMING SOON</button>
+          <button className="game-option-button" onClick={redirectToLogin}>STARTING 5 DAILY</button>
         </div>
 
         <p className="footer">DETROIT BASKETBALL</p>
