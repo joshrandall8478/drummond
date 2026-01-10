@@ -18,7 +18,7 @@ function Home() {
         </div>
 
         <div className = "game-options-container">
-          <button className="game-option-button" onClick={redirectToLogin}>STARTING 5 BATTLES</button>
+          <button className="game-option-button" onClick={redirectToLogin}>STARTING 5 DAILY</button>
         </div>
 
         <p className="footer">DETROIT BASKETBALL</p>
