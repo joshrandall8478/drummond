@@ -80,25 +80,15 @@ public class GameRepository : IGameRepository
         };
     }
 
-    public async Task<List<PlayerStats>> GetMatchingPlayersAsync(GameCriteria criteria, List<string> excludedPositions)
+    public bool MatchesCriteria(PlayerStats player, string criteria)
     {
-        var allPlayers = await _playerRepository.GetAllPlayersWithStatsAsync();
-
-        return allPlayers
-            .Where(p => !excludedPositions.Contains(p.Position))
-            .Where(p => MatchesCriteria(p, criteria.Category1) && MatchesCriteria(p, criteria.Category2))
-            .ToList();
-    }
-
-    private bool MatchesCriteria(PlayerStats player, string criteria)
-    {
-        // Check if criteria is a team name
+        // check if criteria is a team name
         if (_teamNames.Contains(criteria))
         {
             return player.Teams?.Any(t => t == criteria) ?? false;
         }
 
-        // Check stat-based criteria
+        // check stat-based criteria
         return criteria switch
         {
             "All-Stars" => player.AllStars > 0,

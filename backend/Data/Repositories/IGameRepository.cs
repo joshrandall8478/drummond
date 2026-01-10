@@ -10,7 +10,7 @@ namespace backend.Data.Repositories
     {
         Task InitializeAsync();
         Task<GameCriteria> GenerateCriteria();
-        Task<List<PlayerStats>> GetMatchingPlayersAsync(GameCriteria criteria, List<string> excludedPositions);
+        bool MatchesCriteria(PlayerStats player, string criteria); 
         int CalculatePoints(PlayerStats player);
     }
 }
