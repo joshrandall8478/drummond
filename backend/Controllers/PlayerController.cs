@@ -1,3 +1,4 @@
+// Controllers/PlayersController.cs
 using Microsoft.AspNetCore.Mvc;
 using backend.Data.Repositories;
 using backend.Models;
@@ -15,12 +16,13 @@ public class PlayersController : ControllerBase
         _playerRepository = playerRepository;
     }
 
+    // GET: /players
     [HttpGet]
     public async Task<ActionResult<List<Player>>> GetAllPlayers()
     {
         try
         {
-            var players = await _playerRepository.GetAllPlayersAsync();
+            var players = await _playerRepository.GetAllPlayersWithStatsAsync();
             return Ok(players);
         }
         catch (Exception ex)
@@ -29,9 +31,22 @@ public class PlayersController : ControllerBase
         }
     }
 
+    // GET: api/players/{id}
     [HttpGet("{id}")]
-    public async Task<ActionResult> GetPlayerWithStats(int id)
+    public async Task<ActionResult> GetPlayerById(int id)
     {
-       return null;
+        try
+        {
+            var playerStats = await _playerRepository.GetPlayerStatsAsync(id);
+            
+            if (playerStats == null)
+                return NotFound(new { error = "Player not found" });
+
+            return Ok(playerStats);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = ex.Message });
+        }
     }
 }
