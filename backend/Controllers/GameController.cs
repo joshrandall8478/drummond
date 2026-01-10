@@ -41,65 +41,67 @@ public class GameController : ControllerBase
         }
     }
 
-    // POST: game/select-player
-    // selects a player for a position, validates criteria, calculates points, generates next criteria
-    [HttpPost("select-player")]
-    public async Task<ActionResult> SelectPlayer([FromBody] SelectPlayerRequest request)
+[HttpPost("select-player")]
+public async Task<ActionResult> SelectPlayer([FromBody] SelectPlayerRequest request)
+{
+    try
     {
-        try
+        var player = request.Player;
+        var criteria = request.Criteria;
+
+        // extract the individual categories
+        var category1 = criteria.Category1;
+        var category2 = criteria.Category2;
+
+        // verify position matches
+        if (player.Position != request.Position)
         {
-            var player = request.Player;
-            var criteria = request.Criteria;
-
-            // extract the individual categories
-            var category1 = criteria.Category1;
-            var category2 = criteria.Category2;
-
-            // verify position matches
-            if (player.Position != request.Position)
-                return BadRequest(new { error = "Player position doesn't match selected position" });
-
-            if(!(_gameRepository.MatchesCriteria(player, category1) && _gameRepository.MatchesCriteria(player, category2)))
-            {
-                return BadRequest(new { error = "This player does not match both categories!" });
-            }
-
-            // validate player matches criteria
-            // var matchesCriteria = await _gameRepository.ValidatePlayerMatchesCriteria(
-            //     player,
-            //     request.Criteria
-            // );
-
-            // if (!matchesCriteria)
-            //     return BadRequest(new { error = "This player does not match both categories!" });
-
-            // Calculate points
-            var points = _gameRepository.CalculatePoints(player);
-
-            // Generate next criteria if game not complete
-            GameCriteria? nextCriteria = null;
-            if (!request.IsGameComplete)
-            {
-                nextCriteria = await _gameRepository.GenerateCriteria();
-            }
-
             return Ok(new
             {
-                points,
-                player = new
-                {
-                    player.PlayerId,
-                    player.FirstName,
-                    player.LastName,
-                    player.Position
-                },
-                nextCriteria
+                success = false,
+                error = "Player position doesn't match selected position"
             });
         }
-        catch (Exception ex)
+
+        var match1 = _gameRepository.MatchesCriteria(player, category1);
+        
+        var match2 = _gameRepository.MatchesCriteria(player, category2);
+
+        if (!(match1 && match2))
         {
-            return StatusCode(500, new { error = ex.Message });
+            return Ok(new
+            {
+                success = false,
+                error = "This player does not match both categories!"
+            });
         }
+
+        var points = _gameRepository.CalculatePoints(player);
+
+        // generate next criteria if game not complete
+        GameCriteria? nextCriteria = null;
+        if (!request.IsGameComplete)
+        {
+            nextCriteria = await _gameRepository.GenerateCriteria();
+        }
+
+        return Ok(new
+        {
+            success = true,
+            points,
+            player = new
+            {
+                player.PlayerId,
+                player.FirstName,
+                player.LastName,
+                player.Position
+            },
+            nextCriteria
+        });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new { error = ex.Message });
     }
 }
 
@@ -117,4 +119,5 @@ public class SelectPlayerRequest
     public bool IsGameComplete { get; set; }
     public GameCriteria Criteria { get; set; } = new();
     public List<string> FilledPositions { get; set; } = new();
+}
 }

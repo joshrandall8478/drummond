@@ -82,6 +82,11 @@ public class GameRepository : IGameRepository
 
     public bool MatchesCriteria(PlayerStats player, string criteria)
     {
+        // Initialize team names if empty (lazy loading)
+        if (_teamNames.Count == 0)
+        {
+            _teamNames = _playerRepository.GetAllTeamNamesAsync().GetAwaiter().GetResult();
+        }
         // check if criteria is a team name
         if (_teamNames.Contains(criteria))
         {

@@ -215,3 +215,4 @@
 /Users/huntermartin/Desktop/drum/DRUMMOND/backend/obj/Debug/net8.0/backend.pdb
 /Users/huntermartin/Desktop/drum/DRUMMOND/backend/obj/Debug/net8.0/backend.genruntimeconfig.cache
 /Users/huntermartin/Desktop/drum/DRUMMOND/backend/obj/Debug/net8.0/ref/backend.dll
+/Users/huntermartin/Desktop/drum/DRUMMOND/backend/bin/Debug/net8.0/Dapper.dll
