@@ -78,7 +78,6 @@ function Starting5() {
 
         setSelectedPosition(position);
         setSearchQuery('');
-        setIncorrectPlayers([]); // Reset incorrect players for new position
 
         // Filter players by position
         const availablePlayers = allPlayers.filter(p => p.position === position);
@@ -266,7 +265,6 @@ function Starting5() {
                                     setSelectedPosition(null);
                                     setPlayers([]);
                                     setSearchQuery('');
-                                    setIncorrectPlayers([]);
                                 }}
                             >
                                 ✕
@@ -300,7 +298,7 @@ function Starting5() {
                                             className={`player-item ${isIncorrect ? 'incorrect' : ''}`}
                                             onClick={() => !isIncorrect && selectPlayer(player)}
                                         >
-                                            <span className="player-name">
+                                            <span className={`player-name ${isIncorrect ? 'crossed-out' : ''}`}>
                                                 {player.firstName} {player.lastName}
                                                 {isIncorrect && <span className="incorrect-badge"> ✗</span>}
                                             </span>
