@@ -1,4 +1,4 @@
-# DRUMMOND
+# DRUMMOND 🏀
 DRUMMOND is a basketball web application that lets users play a daily “Starting 5” game. Each day, players build a lineup of five NBA players and race to the top of the leaderboard by creating the rarest possible lineup
 
 ## Features
@@ -15,8 +15,7 @@ Compete against other players and climb the rankings each day
 Powered by real NBA player data and team relationships
 
 ## Tech Stack
-React.js, mySQL, .NET 8
-
+React.js, MySQL, .NET 8
 
 ## Development Team
 **Hunter Martin**
