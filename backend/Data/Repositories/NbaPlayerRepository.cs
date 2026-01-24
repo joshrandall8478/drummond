@@ -15,8 +15,27 @@ public class NbaPlayerRepository : INbaPlayerRepository
 
     public async Task<List<string>> GetAllTeamNamesAsync()
     {
-        var sql = "SELECT team_name FROM nba_teams ORDER BY team_name";
-        
+        var sql = @"
+        SELECT team_name
+        FROM nba_teams
+        WHERE team_id NOT IN (
+            1610610034,
+            1610610031,
+            1610610028,
+            1610610025,
+            1610610030,
+            1610610036,
+            1610610026,
+            1610610032,
+            1610610035,
+            1610610029,
+            1610610023,
+            1610610037,
+            1610610033
+        )
+        ORDER BY team_name;
+    ";
+
         using var connection = _database.GetConnection();
         var teams = await connection.QueryAsync<string>(sql);
         return teams.ToList();
