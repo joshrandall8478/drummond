@@ -17,6 +17,15 @@ namespace backend.Models
         public decimal? Rpg { get; set; }
         public decimal? Apg { get; set; }
         public decimal? Spg { get; set; }
+
+        public decimal? Bpg {get ; set;}
+
+        public string? College {get ; set;}
+        public int? DraftYear {get ; set;}
+
+        public int? IsLottery {get ; set;}
+
+        public int YearsInLeague {get; set;}
         public int AllStars { get; set; }
         public int Mvps { get; set; }
         public int Dpoys { get; set; }

@@ -15,8 +15,27 @@ public class NbaPlayerRepository : INbaPlayerRepository
 
     public async Task<List<string>> GetAllTeamNamesAsync()
     {
-        var sql = "SELECT team_name FROM nba_teams ORDER BY team_name";
-        
+        var sql = @"
+        SELECT team_name
+        FROM nba_teams
+        WHERE team_id NOT IN (
+            1610610034,
+            1610610031,
+            1610610028,
+            1610610025,
+            1610610030,
+            1610610036,
+            1610610026,
+            1610610032,
+            1610610035,
+            1610610029,
+            1610610023,
+            1610610037,
+            1610610033
+        )
+        ORDER BY team_name;
+    ";
+
         using var connection = _database.GetConnection();
         var teams = await connection.QueryAsync<string>(sql);
         return teams.ToList();
@@ -34,6 +53,11 @@ public class NbaPlayerRepository : INbaPlayerRepository
                 s.rpg as Rpg,
                 s.apg as Apg,
                 s.spg as Spg,
+                s.bpg as Bpg,
+                s.college as College,
+                s.draft_year as DraftYear,
+                s.is_lottery as IsLottery, 
+                s.years_in_league as YearsInLeague,
                 s.all_stars as AllStars,
                 s.mvps as Mvps,
                 s.dpoys as Dpoys,
@@ -50,7 +74,7 @@ public class NbaPlayerRepository : INbaPlayerRepository
 
     public async Task<List<PlayerStats>> GetAllPlayersWithStatsAsync()
     {
-        var sql = @"
+       var sql = @"
             SELECT 
                 p.player_id as PlayerId,
                 p.first_name as FirstName,
@@ -60,6 +84,11 @@ public class NbaPlayerRepository : INbaPlayerRepository
                 COALESCE(s.rpg, 0) as Rpg,
                 COALESCE(s.apg, 0) as Apg,
                 COALESCE(s.spg, 0) as Spg,
+                COALESCE(s.bpg, 0) as Bpg,
+                s.college as College,
+                s.draft_year as DraftYear,
+                s.is_lottery as IsLottery,
+                s.years_in_league as YearsInLeague,
                 COALESCE(s.all_stars, 0) as AllStars,
                 COALESCE(s.mvps, 0) as Mvps,
                 COALESCE(s.dpoys, 0) as Dpoys,
