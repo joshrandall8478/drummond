@@ -584,7 +584,7 @@
 
 .surrender-message {
     margin-bottom: 20px;
-    fontSize: 16px;
+    font-size: 16px;
     color: var(--text-primary);
 }
 
