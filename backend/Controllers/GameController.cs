@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using backend.Data.Repositories;
 using backend.Models;
+using backend.Data.Repositories;
 
 namespace backend.Controllers;
 
@@ -9,30 +9,39 @@ namespace backend.Controllers;
 public class GameController : ControllerBase
 {
     private readonly IGameRepository _gameRepository;
-    private readonly INbaPlayerRepository _playerRepository;
 
-    public GameController(
-        IGameRepository gameRepository,
-        INbaPlayerRepository playerRepository)
+    public GameController(IGameRepository gameRepository)
     {
         _gameRepository = gameRepository;
-        _playerRepository = playerRepository;
     }
 
-    // POST: game/start
-    // starts a new game and returns initial criteria
     [HttpPost("start")]
-    public async Task<ActionResult> StartGame()
+    public async Task<IActionResult> StartGame([FromBody] StartGameRequest request)
     {
         try
         {
-            var criteria = await _gameRepository.GenerateCriteria();
-            
+            // Get or create daily game using the seed (date string like "2026-01-24")
+            var dailyGame = await _gameRepository.GetOrCreateTodayGameAsync(request.Seed);
+
+            // Return first round criteria AND the full game for cached state restoration
+            var criteria = dailyGame.GetCriteriaForRound(1);
+
             return Ok(new
             {
                 criteria,
-                score = 0,
-                lineup = new GameLineup()
+                dailyGame = new
+                {
+                    round1Category1 = dailyGame.Round1Category1,
+                    round1Category2 = dailyGame.Round1Category2,
+                    round2Category1 = dailyGame.Round2Category1,
+                    round2Category2 = dailyGame.Round2Category2,
+                    round3Category1 = dailyGame.Round3Category1,
+                    round3Category2 = dailyGame.Round3Category2,
+                    round4Category1 = dailyGame.Round4Category1,
+                    round4Category2 = dailyGame.Round4Category2,
+                    round5Category1 = dailyGame.Round5Category1,
+                    round5Category2 = dailyGame.Round5Category2
+                }
             });
         }
         catch (Exception ex)
@@ -41,75 +50,65 @@ public class GameController : ControllerBase
         }
     }
 
-[HttpPost("select-player")]
-public async Task<ActionResult> SelectPlayer([FromBody] SelectPlayerRequest request)
-{
-    try
+    [HttpPost("select-player")]
+    public async Task<IActionResult> SelectPlayer([FromBody] SelectPlayerRequest request)
     {
-        var player = request.Player;
-        var criteria = request.Criteria;
-
-        // extract the individual categories
-        var category1 = criteria.Category1;
-        var category2 = criteria.Category2;
-
-        // verify position matches
-        if (player.Position != request.Position)
+        try
         {
-            return Ok(new
+            // Validate player matches both criteria
+            var matchesCat1 = _gameRepository.MatchesCriteria(request.Player, request.Criteria.Category1);
+            var matchesCat2 = _gameRepository.MatchesCriteria(request.Player, request.Criteria.Category2);
+
+            if (!matchesCat1 || !matchesCat2)
             {
-                success = false,
-                error = "Player position doesn't match selected position"
+                return Ok(new 
+                { 
+                    success = false, 
+                    error = "This player does not match both categories!" 
+                });
+            }
+
+            // Calculate points
+            var points = _gameRepository.CalculatePoints(request.Player);
+
+            // If game is complete, don't return next criteria
+            if (request.IsGameComplete)
+            {
+                return Ok(new 
+                { 
+                    success = true, 
+                    points,
+                    gameComplete = true 
+                });
+            }
+
+            // Get daily game and determine next round
+            var dailyGame = await _gameRepository.GetOrCreateTodayGameAsync(DateTime.Today.ToString("yyyy-MM-dd"));
+            
+            // Calculate next round number
+            // FilledPositions has positions already filled BEFORE this selection
+            // So if FilledPositions.Count = 0, we just filled round 1, next is round 2
+            var nextRound = request.FilledPositions.Count + 2;
+            var nextCriteria = dailyGame.GetCriteriaForRound(nextRound);
+
+            return Ok(new 
+            { 
+                success = true, 
+                points, 
+                nextCriteria 
             });
         }
-
-        var match1 = _gameRepository.MatchesCriteria(player, category1);
-        
-        var match2 = _gameRepository.MatchesCriteria(player, category2);
-
-        if (!(match1 && match2))
+        catch (Exception ex)
         {
-            return Ok(new
-            {
-                success = false,
-                error = "This player does not match both categories!"
-            });
+            return StatusCode(500, new { error = ex.Message });
         }
-
-        var points = _gameRepository.CalculatePoints(player);
-
-        // generate next criteria if game not complete
-        GameCriteria? nextCriteria = null;
-        if (!request.IsGameComplete)
-        {
-            nextCriteria = await _gameRepository.GenerateCriteria();
-        }
-
-        return Ok(new
-        {
-            success = true,
-            points,
-            player = new
-            {
-                player.PlayerId,
-                player.FirstName,
-                player.LastName,
-                player.Position
-            },
-            nextCriteria
-        });
-    }
-    catch (Exception ex)
-    {
-        return StatusCode(500, new { error = ex.Message });
     }
 }
 
-// Request Models
-public class GetPlayersRequest
+// Request models
+public class StartGameRequest
 {
-    public GameCriteria Criteria { get; set; } = new();
-    public List<string> FilledPositions { get; set; } = new();
+    public string Seed { get; set; } = string.Empty;
 }
 
 public class SelectPlayerRequest
@@ -119,5 +118,4 @@ public class SelectPlayerRequest
     public bool IsGameComplete { get; set; }
     public GameCriteria Criteria { get; set; } = new();
     public List<string> FilledPositions { get; set; } = new();
-}
 }
