@@ -1,11 +1,13 @@
 using backend.Models;
+using MySqlConnector;
+using Dapper;
 
 namespace backend.Data.Repositories;
 
 public class GameRepository : IGameRepository
 {
     private readonly INbaPlayerRepository _playerRepository;
-    private readonly Random _random = new();
+    private readonly Database _database;
     private List<string> _teamNames = new();
 
     private readonly List<string> _statCategories = new()
@@ -75,9 +77,10 @@ public class GameRepository : IGameRepository
         "Champion Without All-Star"
     };
 
-    public GameRepository(INbaPlayerRepository playerRepository)
+    public GameRepository(INbaPlayerRepository playerRepository, Database database)
     {
         _playerRepository = playerRepository;
+        _database = database;
     }
 
     public async Task InitializeAsync()
@@ -85,27 +88,186 @@ public class GameRepository : IGameRepository
         _teamNames = await _playerRepository.GetAllTeamNamesAsync();
     }
 
-    public async Task<GameCriteria> GenerateCriteria()
+    // Get or create today's game from database
+    public async Task<DailyGame> GetOrCreateTodayGameAsync(string seed)
     {
+        var today = DateTime.Today;
+        
+        // Check if game exists for today
+        var existingGame = await GetGameFromDatabaseAsync(today);
+        if (existingGame != null)
+        {
+            // Validate that the game has all required criteria
+            if (IsGameValid(existingGame))
+            {
+                return existingGame;
+            }
+            // If game is invalid, delete it and create a new one
+            await DeleteGameByDateAsync(today);
+        }
+
+        // Generate new game with seed
+        var dailyGame = await GenerateDailyGameAsync(seed);
+        
+        // Save to database
+        await SaveDailyGameAsync(dailyGame);
+        
+        // Clean up old games
+        await DeleteOldGamesAsync(today);
+        
+        return dailyGame;
+    }
+
+    private bool IsGameValid(DailyGame game)
+    {
+        // Check that all 5 rounds have valid criteria
+        return !string.IsNullOrEmpty(game.Round1Category1) && 
+               !string.IsNullOrEmpty(game.Round1Category2) &&
+               !string.IsNullOrEmpty(game.Round2Category1) && 
+               !string.IsNullOrEmpty(game.Round2Category2) &&
+               !string.IsNullOrEmpty(game.Round3Category1) && 
+               !string.IsNullOrEmpty(game.Round3Category2) &&
+               !string.IsNullOrEmpty(game.Round4Category1) && 
+               !string.IsNullOrEmpty(game.Round4Category2) &&
+               !string.IsNullOrEmpty(game.Round5Category1) && 
+               !string.IsNullOrEmpty(game.Round5Category2);
+    }
+
+    private async Task<DailyGame?> GetGameFromDatabaseAsync(DateTime date)
+    {
+        var sql = @"
+            SELECT * FROM daily_games 
+            WHERE DATE(created_at) = @Date 
+            ORDER BY daily_game_id DESC 
+            LIMIT 1";
+
+        using var connection = _database.GetConnection();
+        var game = await connection.QueryFirstOrDefaultAsync<DailyGame>(sql, new { Date = date.Date });
+        return game;
+    }
+
+    private async Task DeleteGameByDateAsync(DateTime date)
+    {
+        var sql = "DELETE FROM daily_games WHERE DATE(created_at) = @Date";
+        
+        using var connection = _database.GetConnection();
+        await connection.ExecuteAsync(sql, new { Date = date.Date });
+    }
+
+    private async Task<DailyGame> GenerateDailyGameAsync(string seed)
+    {
+        // Use seed to create deterministic random
+        var random = new Random(GetSeedHash(seed));
+        
         if (_teamNames.Count == 0)
         {
             _teamNames = await _playerRepository.GetAllTeamNamesAsync();
         }
 
+        var dailyGame = new DailyGame { CreatedAt = DateTime.Now };
         var allCategories = new List<string>();
         allCategories.AddRange(_teamNames);
         allCategories.AddRange(_statCategories);
+        
+        var usedCategories = new HashSet<string>();
 
-        // pick two different categories!!
-        var category1 = allCategories[_random.Next(allCategories.Count)];
-        allCategories.Remove(category1);
-        var category2 = allCategories[_random.Next(allCategories.Count)];
-
-        return new GameCriteria
+        // Generate 5 rounds
+        for (int round = 1; round <= 5; round++)
         {
-            Category1 = category1,
-            Category2 = category2
-        };
+            var availableCategories = allCategories.Where(c => !usedCategories.Contains(c)).ToList();
+            
+            if (availableCategories.Count < 2)
+            {
+                availableCategories = allCategories; // Reset if needed
+                usedCategories.Clear();
+            }
+
+            var category1 = availableCategories[random.Next(availableCategories.Count)];
+            availableCategories.Remove(category1);
+            var category2 = availableCategories[random.Next(availableCategories.Count)];
+
+            usedCategories.Add(category1);
+            usedCategories.Add(category2);
+
+            SetRoundCriteria(dailyGame, round, new GameCriteria 
+            { 
+                Category1 = category1, 
+                Category2 = category2 
+            });
+        }
+
+        return dailyGame;
+    }
+
+    private void SetRoundCriteria(DailyGame game, int round, GameCriteria criteria)
+    {
+        switch (round)
+        {
+            case 1:
+                game.Round1Category1 = criteria.Category1;
+                game.Round1Category2 = criteria.Category2;
+                break;
+            case 2:
+                game.Round2Category1 = criteria.Category1;
+                game.Round2Category2 = criteria.Category2;
+                break;
+            case 3:
+                game.Round3Category1 = criteria.Category1;
+                game.Round3Category2 = criteria.Category2;
+                break;
+            case 4:
+                game.Round4Category1 = criteria.Category1;
+                game.Round4Category2 = criteria.Category2;
+                break;
+            case 5:
+                game.Round5Category1 = criteria.Category1;
+                game.Round5Category2 = criteria.Category2;
+                break;
+        }
+    }
+
+    private async Task SaveDailyGameAsync(DailyGame game)
+    {
+        var sql = @"
+            INSERT INTO daily_games (
+                round1_category1, round1_category2,
+                round2_category1, round2_category2,
+                round3_category1, round3_category2,
+                round4_category1, round4_category2,
+                round5_category1, round5_category2,
+                created_at
+            ) VALUES (
+                @Round1Category1, @Round1Category2,
+                @Round2Category1, @Round2Category2,
+                @Round3Category1, @Round3Category2,
+                @Round4Category1, @Round4Category2,
+                @Round5Category1, @Round5Category2,
+                @CreatedAt
+            )";
+
+        using var connection = _database.GetConnection();
+        await connection.ExecuteAsync(sql, game);
+    }
+
+    private async Task DeleteOldGamesAsync(DateTime keepDate)
+    {
+        var sql = "DELETE FROM daily_games WHERE DATE(created_at) < @KeepDate";
+        
+        using var connection = _database.GetConnection();
+        await connection.ExecuteAsync(sql, new { KeepDate = keepDate.Date });
+    }
+
+    private int GetSeedHash(string seed)
+    {
+        unchecked
+        {
+            int hash = 17;
+            foreach (char c in seed)
+            {
+                hash = hash * 31 + c;
+            }
+            return hash;
+        }
     }
 
     public bool MatchesCriteria(PlayerStats player, string criteria)
@@ -197,7 +359,6 @@ public class GameRepository : IGameRepository
     public int CalculatePoints(PlayerStats player)
     {
         int points = 500;
-
         return points;
     }
 }

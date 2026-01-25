@@ -572,3 +572,58 @@
   color: tomato;
   text-decoration: line-through;
 }
+
+.surrender-modal {
+    max-width: 400px;
+}
+
+.surrender-content {
+    padding: 20px;
+    text-align: center;
+}
+
+.surrender-message {
+    margin-bottom: 20px;
+    font-size: 16px;
+    color: var(--text-primary);
+}
+
+.surrender-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.surrender-cancel {
+    padding: 10px 20px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.surrender-cancel:hover {
+    background-color: #5a6268;
+}
+
+.surrender-confirm {
+    padding: 10px 20px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.surrender-confirm:hover {
+    background-color: #c82333;
+}
+
+.final-lineup-item.not-selected {
+    opacity: 0.5;
+}

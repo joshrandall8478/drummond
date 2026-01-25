@@ -1,16 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using backend.Models;
 
-namespace backend.Data.Repositories
+namespace backend.Data.Repositories;
+
+public interface IGameRepository
 {
-    public interface IGameRepository
-    {
-        Task InitializeAsync();
-        Task<GameCriteria> GenerateCriteria();
-        bool MatchesCriteria(PlayerStats player, string criteria); 
-        int CalculatePoints(PlayerStats player);
-    }
+    Task InitializeAsync();
+    Task<DailyGame> GetOrCreateTodayGameAsync(string seed);
+    bool MatchesCriteria(PlayerStats player, string criteria);
+    int CalculatePoints(PlayerStats player);
 }
