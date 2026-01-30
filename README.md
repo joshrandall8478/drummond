@@ -21,5 +21,3 @@ React.js, MySQL, .NET 8
 **Hunter Martin**
 
 **Charles Thorn**
-
-**Owen O'Brien**
